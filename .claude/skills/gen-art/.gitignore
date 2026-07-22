@@ -1,0 +1,10 @@
+# Your API key lives in .env — never commit it.
+.env
+.env.local
+.env.*.local
+
+# ...but the template SHOULD be committed so students know the format.
+!.env.example
+
+# Generated art — students regenerate their own; don't commit it.
+assets/images/

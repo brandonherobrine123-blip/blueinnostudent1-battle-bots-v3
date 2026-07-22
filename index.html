@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Asset Gallery</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="print.css" media="print">
+</head>
+<body>
+  <!-- The header text comes from rulebook.js (title, mark, tagline). -->
+  <header class="topbar">
+    <div class="brand" id="brand"></div>
+    <div class="tagline" id="tagline"></div>
+  </header>
+  <nav class="main-menu" id="mainMenu">
+    <button class="menu-btn active" data-view="play">▶ Play</button>
+    <button class="menu-btn" data-view="rules">📖 Rules</button>
+    <div class="levels-dropdown">
+      <button class="menu-btn" id="levelsBtn">⚙ Levels ▾</button>
+      <div class="dropdown-panel" id="levelsPanel">
+        <button class="level-opt" data-level="simple">⚡ Simple — 15 cards each</button>
+        <button class="level-opt active" data-level="crazy">🔥 Crazy — 30 cards each</button>
+        <button class="level-opt" data-level="chaotic">💀 Chaotic — 60 cards each</button>
+      </div>
+    </div>
+  </nav>
+  <main>
+    <section id="playView" class="view active">
+      <!-- Game Panel -->
+      <section id="gamePanel" class="game-panel">
+        <div id="gameStart" class="game-screen">
+          <h2>⚔ Battle Bots V3</h2>
+          <p class="game-intro">Build your bot in secret, then fight!</p>
+          <div class="game-level-pick">
+            <span>Level:</span>
+            <strong id="gameLevelLabel">Crazy — 30 cards</strong>
+          </div>
+          <button class="game-btn primary" id="btnStartGame">🔧 Start Build Phase</button>
+          <p class="game-hint">Use the Levels menu above to change difficulty.</p>
+        </div>
+
+        <div id="gameBuild" class="game-screen" style="display:none">
+          <h2>🔧 Build Phase — Assemble Your Bot</h2>
+          <div class="build-layout">
+            <div class="build-hand" id="buildHand">
+              <h3>Your Hand <span id="handCount"></span></h3>
+              <div class="hand-grid" id="handGrid"></div>
+            </div>
+            <div class="build-bot" id="buildBot">
+              <h3>Your Bot <span id="slotCount"></span></h3>
+              <div class="bot-stats-panel" id="botStatsPanel"></div>
+              <div class="bot-slots" id="botSlots"></div>
+            </div>
+          </div>
+          <div class="game-actions">
+            <button class="game-btn primary" id="btnReveal">⚡ Reveal &amp; Fight!</button>
+            <button class="game-btn" id="btnRedraw">🔄 Redraw Hand</button>
+          </div>
+        </div>
+
+        <div id="gameFight" class="game-screen" style="display:none">
+          <h2>⚡ Fight Phase</h2>
+          <div class="fight-arena">
+            <div class="fighter" id="playerBot">
+              <h3>Your Bot</h3>
+              <div class="fighter-stats" id="playerFighterStats"></div>
+            </div>
+            <div class="fight-vs">VS</div>
+            <div class="fighter" id="enemyBot">
+              <h3>Enemy Bot</h3>
+              <div class="fighter-stats" id="enemyFighterStats"></div>
+            </div>
+          </div>
+          <div class="fight-log" id="fightLog"></div>
+          <div class="fight-hand" id="fightHand"></div>
+          <div class="game-actions" id="fightActions">
+            <span id="roundInfo" class="round-badge"></span>
+            <span id="turnInfo" class="turn-badge"></span>
+          </div>
+        </div>
+
+        <div id="gameOver" class="game-screen" style="display:none">
+          <h2 id="gameResult"></h2>
+          <p id="gameSummary"></p>
+          <button class="game-btn primary" id="btnPlayAgain">🔄 Play Again</button>
+        </div>
+      </section>
+
+      <section id="rulebook" class="rulebook" aria-label="Rulebook"></section>
+      <div id="gallery" class="gallery"></div>
+    </section>
+    <section id="rulesView" class="view" style="display:none">
+      <section id="rulesFull" class="rulebook" aria-label="Full Rules"></section>
+    </section>
+  </main>
+  <script src="rulebook.js"></script>
+  <script src="assets.js"></script>
+  <script src="gallery-core.js"></script>
+  <script src="gallery.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
