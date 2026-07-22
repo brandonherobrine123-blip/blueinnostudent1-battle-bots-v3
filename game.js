@@ -7,12 +7,16 @@
   var LEVEL_DRAW = { simple: 15, crazy: 30, chaotic: 60 };
   var CHASSIS = { hp: 50, atk: 5, def: 0, spd: 3, eng: 30, rng: 3 };
 
-  // Slot definitions
-  var SLOTS = {
-    Head: 1, Arm: 2, Leg: 2, Core: 1, Hardpoint: 9
-  };
-  var MAX_MATERIALS = 5;
-  var MAX_PARTS = 15;
+  // Player slots — infinite (no limits)
+  var INF = Infinity;
+  var PLAYER_SLOTS = { Head: INF, Arm: INF, Leg: INF, Core: INF, Hardpoint: INF };
+  var PLAYER_MAX_MATERIALS = INF;
+  var PLAYER_MAX_PARTS = INF;
+
+  // Enemy slots — normal limits
+  var ENEMY_SLOTS = { Head: 1, Arm: 2, Leg: 2, Core: 1, Hardpoint: 9 };
+  var ENEMY_MAX_MATERIALS = 5;
+  var ENEMY_MAX_PARTS = 15;
 
   var playerHand = [];
   var playerAttached = []; // { asset, slotType }
@@ -66,8 +70,9 @@
   }
 
   function slotLabel(slotType) {
-    var max = SLOTS[slotType] || 0;
-    return slotType + ' (' + max + ' slot' + (max > 1 ? 's' : '') + ')';
+    var max = PLAYER_SLOTS[slotType] || 0;
+    var label = max === INF ? '∞' : String(max);
+    return slotType + ' (' + label + ' slot' + (max === 1 ? '' : 's') + ')';
   }
 
   function assetStatStr(a) {
@@ -148,34 +153,22 @@
     enemyAttached = [];
     enemyMaterials = [];
     var slotCounts = {};
-    var keys = Object.keys(SLOTS);
+    var keys = Object.keys(ENEMY_SLOTS);
     for (var i = 0; i < keys.length; i++) slotCounts[keys[i]] = 0;
 
     var shuffled = shuffle(enemyHand);
     for (var i = 0; i < shuffled.length; i++) {
       var a = shuffled[i];
       if (isMaterial(a)) {
-        if (enemyMaterials.length < MAX_MATERIALS) {
+        if (enemyMaterials.length < ENEMY_MAX_MATERIALS) {
           enemyMaterials.push(a);
         }
       } else {
         var st = slotTypeFor(a);
-        var max = SLOTS[st] || 9;
-        if (st === 'Hardpoint') {
-          // Count total non-material, non-hardpoint attached
-          var nonHp = 0;
-          for (var j = 0; j < enemyAttached.length; j++) {
-            if (enemyAttached[j].slotType !== 'Hardpoint') nonHp++;
-          }
-          if (enemyAttached.length < MAX_PARTS && (slotCounts[st] || 0) < max) {
-            enemyAttached.push({ asset: a, slotType: st });
-            slotCounts[st] = (slotCounts[st] || 0) + 1;
-          }
-        } else {
-          if ((slotCounts[st] || 0) < max && enemyAttached.length < MAX_PARTS) {
-            enemyAttached.push({ asset: a, slotType: st });
-            slotCounts[st] = (slotCounts[st] || 0) + 1;
-          }
+        var max = ENEMY_SLOTS[st] || 9;
+        if ((slotCounts[st] || 0) < max && enemyAttached.length < ENEMY_MAX_PARTS) {
+          enemyAttached.push({ asset: a, slotType: st });
+          slotCounts[st] = (slotCounts[st] || 0) + 1;
         }
       }
     }
@@ -221,18 +214,16 @@
 
   function toggleAttach(asset, slotT, isMat) {
     if (isMat) {
-      // Check if already attached as material
       var idx = -1;
       for (var i = 0; i < playerMaterials.length; i++) {
         if (playerMaterials[i].id === asset.id && playerMaterials[i] === asset) { idx = i; break; }
       }
       if (idx >= 0) {
         playerMaterials.splice(idx, 1);
-      } else if (playerMaterials.length < MAX_MATERIALS) {
+      } else if (playerMaterials.length < PLAYER_MAX_MATERIALS) {
         playerMaterials.push(asset);
       }
     } else {
-      // Check if already attached
       var idx2 = -1;
       for (var i = 0; i < playerAttached.length; i++) {
         if (playerAttached[i].asset.id === asset.id && playerAttached[i].asset === asset) { idx2 = i; break; }
@@ -240,14 +231,13 @@
       if (idx2 >= 0) {
         playerAttached.splice(idx2, 1);
       } else {
-        // Count slots used
         var inSlot = 0;
         for (var i = 0; i < playerAttached.length; i++) {
           if (playerAttached[i].slotType === slotT) inSlot++;
         }
-        var max = SLOTS[slotT] || 9;
-        if (inSlot >= max) return; // Slot full
-        if (playerAttached.length >= MAX_PARTS) return; // Bot full
+        var max = PLAYER_SLOTS[slotT] || INF;
+        if (inSlot >= max) return;
+        if (playerAttached.length >= PLAYER_MAX_PARTS) return;
         playerAttached.push({ asset: asset, slotType: slotT });
       }
     }
@@ -283,13 +273,12 @@
     var slotTypes = ['Head', 'Arm', 'Leg', 'Core', 'Hardpoint'];
     for (var s = 0; s < slotTypes.length; s++) {
       var st = slotTypes[s];
-      var max = SLOTS[st];
+      var max = PLAYER_SLOTS[st];
       var used = countInSlot(st);
       var sg = el('div', 'slot-group');
-      if (used >= max) sg.classList.add('full');
-      sg.appendChild(el('div', 'sg-label', st));
-      var usedStr = used + ' / ' + max + ' used';
-      // List attached names
+      var maxLabel = max === INF ? '∞' : String(max);
+      sg.appendChild(el('div', 'sg-label', st + ' (' + maxLabel + ' slots)'));
+      var usedStr = used + ' / ' + maxLabel + ' used';
       var names = [];
       for (var j = 0; j < playerAttached.length; j++) {
         if (playerAttached[j].slotType === st) names.push(playerAttached[j].asset.name);
@@ -300,15 +289,16 @@
 
     // Materials
     var matGroup = el('div', 'slot-group');
-    if (playerMaterials.length >= MAX_MATERIALS) matGroup.classList.add('full');
-    matGroup.appendChild(el('div', 'sg-label', 'Materials (slot-free)'));
+    var matMaxLabel = PLAYER_MAX_MATERIALS === INF ? '∞' : String(PLAYER_MAX_MATERIALS);
+    matGroup.appendChild(el('div', 'sg-label', 'Materials (slot-free, ' + matMaxLabel + ' max)'));
     var matNames = [];
     for (var m = 0; m < playerMaterials.length; m++) matNames.push(playerMaterials[m].name);
-    matGroup.appendChild(el('div', 'sg-used', playerMaterials.length + ' / ' + MAX_MATERIALS + (matNames.length ? ': ' + matNames.join(', ') : '')));
+    matGroup.appendChild(el('div', 'sg-used', playerMaterials.length + ' / ' + matMaxLabel + (matNames.length ? ': ' + matNames.join(', ') : '')));
     slotDiv.appendChild(matGroup);
 
     // Part count
-    document.getElementById('slotCount').textContent = '(' + playerAttached.length + '/' + MAX_PARTS + ' parts, ' + playerMaterials.length + '/' + MAX_MATERIALS + ' mats)';
+    var partsLabel = PLAYER_MAX_PARTS === INF ? '∞' : String(PLAYER_MAX_PARTS);
+    document.getElementById('slotCount').textContent = '(' + playerAttached.length + '/' + partsLabel + ' parts, ' + playerMaterials.length + '/' + matMaxLabel + ' mats)';
   }
 
   // ---- Fight Phase ----
