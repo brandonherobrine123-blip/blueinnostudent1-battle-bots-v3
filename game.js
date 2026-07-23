@@ -141,9 +141,13 @@
     var shuffled = shuffle(normalPool);
     playerHand = shuffled.slice(0, Math.min(drawCount, shuffled.length));
 
-    // 99.999% chance to get the god card
-    if (godCard && Math.random() <= 0.99999) {
-      playerHand.push(godCard);
+    // 99.999% chance per roll — god cards stack (5 rolls)
+    if (godCard) {
+      for (var g = 0; g < 5; g++) {
+        if (Math.random() <= 0.99999) {
+          playerHand.push(godCard);
+        }
+      }
     }
 
     // Enemy gets random hand — NEVER gets god card
@@ -565,8 +569,12 @@
       var godCard = ASSETS.filter(function (a) { return a.type === 'card' && a.category === 'God'; })[0];
       var drawCount = LEVEL_DRAW[currentLevel];
       playerHand = shuffle(normalPool).slice(0, Math.min(drawCount, normalPool.length));
-      if (godCard && Math.random() <= 0.99999) {
-        playerHand.push(godCard);
+      if (godCard) {
+        for (var g2 = 0; g2 < 5; g2++) {
+          if (Math.random() <= 0.99999) {
+            playerHand.push(godCard);
+          }
+        }
       }
       playerAttached = [];
       playerMaterials = [];
