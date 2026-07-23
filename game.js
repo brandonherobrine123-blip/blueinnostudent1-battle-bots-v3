@@ -374,10 +374,6 @@
     playerSpdBonus = 0; enemySkipNext = false; playerSkipNext = false;
     playerFreeStrike = false;
 
-    // Reset action cards — fresh hand each round
-    for (var i = 0; i < playerActions.length; i++) { playerActions[i]._played = false; }
-    for (var i = 0; i < enemyActions.length; i++) { enemyActions[i]._played = false; }
-
     // Reset HP & ENG to full
     var pStats = {};
     var pKeys = Object.keys(pTemplate);
@@ -466,7 +462,6 @@
 
     for (var i = 0; i < playerActions.length; i++) {
       var a = playerActions[i];
-      if (a._played) continue;
       var card = el('div', 'action-card');
       card.appendChild(el('div', 'ac-name', a.name));
       var cost = typeof a.cost === 'number' ? a.cost : 0;
@@ -496,7 +491,7 @@
     if (action.onceOnly && lastStandUsed) { log('Already used this fight!', 'you'); return; }
 
     pStats.eng -= cost;
-    action._played = true;
+    // All cards have infinite uses — never consumed
     if (action.onceOnly) lastStandUsed = true;
     playerFreeStrike = false;
     playerAtkMult = 1;  // reset after each attack
@@ -601,10 +596,8 @@
 
     var available = [];
     for (var i = 0; i < enemyActions.length; i++) {
-      if (!enemyActions[i]._played) {
-        var cost = typeof enemyActions[i].cost === 'number' ? enemyActions[i].cost : 0;
-        if (eStats.eng >= cost) available.push(i);
-      }
+      var cost = typeof enemyActions[i].cost === 'number' ? enemyActions[i].cost : 0;
+      if (eStats.eng >= cost) available.push(i);
     }
 
     if (available.length === 0) {
@@ -617,7 +610,6 @@
     var action = enemyActions[idx];
     var cost = typeof action.cost === 'number' ? action.cost : 0;
     eStats.eng -= cost;
-    action._played = true;
     enemyAtkMult = 1;
 
     var msg = 'Enemy plays ' + action.name;
