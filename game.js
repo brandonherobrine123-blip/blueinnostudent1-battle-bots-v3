@@ -31,6 +31,8 @@
   var maxRounds = 3;
   var playerPassed = false;
   var gameActive = false;
+  var playerMaxHp = 50;
+  var enemyMaxHp = 50;
 
   // ---- Helpers ----
   function el(t, c, txt) {
@@ -327,7 +329,8 @@
       enemyMaterials
     );
 
-    // Draw action hands (15 each)
+    playerMaxHp = playerStats.hp;
+    enemyMaxHp = enemyStats.hp;
     var actionPool = ASSETS.filter(function (a) { return a.type === 'tile'; });
     var shuffled = shuffle(actionPool);
     playerActions = shuffled.slice(0, Math.min(15, shuffled.length));
@@ -335,8 +338,8 @@
     enemyActions = shuffled2.slice(0, Math.min(15, shuffled2.length));
 
     // Render fight screen
-    renderFighterStats('playerFighterStats', playerStats);
-    renderFighterStats('enemyFighterStats', enemyStats);
+    renderFighterStats('playerFighterStats', playerStats, playerMaxHp, true);
+    renderFighterStats('enemyFighterStats', enemyStats, enemyMaxHp, false);
 
     document.getElementById('fightLog').innerHTML = '';
     document.getElementById('roundInfo').textContent = 'Round 1 / 3';
@@ -357,19 +360,65 @@
     gameActive = true;
   }
 
-  function renderFighterStats(elId, stats) {
+  function renderFighterStats(elId, stats, maxHp, isPlayer) {
     var elm = document.getElementById(elId);
     elm.innerHTML = '';
+
+    // Bot icon
+    var icon = el('div', 'bot-icon');
+    icon.innerHTML = isPlayer ?
+      '<svg viewBox="0 0 64 64" fill="none" stroke="#213F99" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="64" height="64">' +
+        '<rect x="14" y="8" width="36" height="48" rx="6"/>' +
+        '<circle cx="26" cy="26" r="4" fill="#45ACF4" stroke="none"/>' +
+        '<circle cx="38" cy="26" r="4" fill="#45ACF4" stroke="none"/>' +
+        '<rect x="22" y="38" width="20" height="4" rx="2"/>' +
+        '<line x1="8" y1="20" x2="14" y2="20"/>' +
+        '<line x1="8" y1="28" x2="14" y2="28"/>' +
+        '<line x1="50" y1="20" x2="56" y2="20"/>' +
+        '<line x1="50" y1="28" x2="56" y2="28"/>' +
+        '<path d="M22 56l-4 6h28l-4-6"/>' +
+        '<circle cx="32" cy="6" r="3" fill="#45ACF4" stroke="none"/>' +
+      '</svg>' :
+      '<svg viewBox="0 0 64 64" fill="none" stroke="#c44" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="64" height="64">' +
+        '<rect x="10" y="10" width="44" height="44" rx="8"/>' +
+        '<circle cx="24" cy="28" r="5" fill="#c44" stroke="none"/>' +
+        '<circle cx="40" cy="28" r="5" fill="#c44" stroke="none"/>' +
+        '<rect x="18" y="42" width="28" height="6" rx="2"/>' +
+        '<line x1="6" y1="22" x2="14" y2="22"/>' +
+        '<line x1="50" y1="22" x2="58" y2="22"/>' +
+        '<line x1="6" y1="34" x2="14" y2="34"/>' +
+        '<line x1="50" y1="34" x2="58" y2="34"/>' +
+        '<path d="M16 54l-4 6h40l-4-6"/>' +
+        '<line x1="32" y1="2" x2="32" y2="10"/>' +
+        '<circle cx="32" cy="2" r="4" fill="#c44" stroke="none"/>' +
+      '</svg>';
+    elm.appendChild(icon);
+
+    // HP bar
+    var hpPct = maxHp > 0 ? Math.max(0, Math.round((stats.hp / maxHp) * 100)) : 0;
+    var hpBar = el('div', 'hp-bar-wrap');
+    var barFill = el('div', 'hp-bar-fill');
+    barFill.style.width = hpPct + '%';
+    if (hpPct <= 25) barFill.classList.add('critical');
+    else if (hpPct <= 50) barFill.classList.add('warning');
+    hpBar.appendChild(barFill);
+    var hpLabel = el('div', 'hp-bar-label', 'HP: ' + Math.max(0, stats.hp) + ' / ' + maxHp);
+    hpBar.appendChild(hpLabel);
+    elm.appendChild(hpBar);
+
+    // Stats grid
+    var statGrid = el('div', 'fighter-stats');
     var keys = [
-      ['HP', 'hp'], ['ATK', 'atk'], ['DEF', 'def'],
-      ['SPD', 'spd'], ['ENG', 'eng'], ['RNG', 'rng'],
+      ['ATK', 'atk'], ['DEF', 'def'], ['SPD', 'spd'],
+      ['ENG', 'eng'], ['RNG', 'rng'],
     ];
     for (var i = 0; i < keys.length; i++) {
       var div = el('div', 'fs-stat');
       div.appendChild(el('div', 'fs-label', keys[i][0]));
       div.appendChild(el('div', 'fs-val', String(stats[keys[i][1]])));
-      elm.appendChild(div);
+      statGrid.appendChild(div);
     }
+    elm.appendChild(statGrid);
   }
 
   function renderFightHand(pStats, eStats) {
@@ -410,8 +459,8 @@
     log('You play ' + action.name + ' — ' + dmg + ' damage! (ENG: ' + pStats.eng + ')', 'you');
     log('Enemy HP: ' + Math.max(0, eStats.hp), 'enemy');
 
-    renderFighterStats('playerFighterStats', pStats);
-    renderFighterStats('enemyFighterStats', eStats);
+    renderFighterStats('playerFighterStats', pStats, playerMaxHp, true);
+    renderFighterStats('enemyFighterStats', eStats, enemyMaxHp, false);
     renderFightHand(pStats, eStats);
 
     if (eStats.hp <= 0) {
@@ -453,8 +502,8 @@
     log('Enemy plays ' + action.name + ' — ' + dmg + ' damage! (Enemy ENG: ' + eStats.eng + ')', 'enemy');
     log('Your HP: ' + Math.max(0, pStats.hp), 'you');
 
-    renderFighterStats('playerFighterStats', pStats);
-    renderFighterStats('enemyFighterStats', eStats);
+    renderFighterStats('playerFighterStats', pStats, playerMaxHp, true);
+    renderFighterStats('enemyFighterStats', eStats, enemyMaxHp, false);
 
     if (pStats.hp <= 0) {
       endGame('lose', pStats, eStats);
@@ -517,8 +566,8 @@
     eStats.eng += 10;
     log('--- Round ' + fightRound + ' / ' + maxRounds + ' --- +10 ENG each ---', 'you');
     document.getElementById('roundInfo').textContent = 'Round ' + fightRound + ' / ' + maxRounds;
-    renderFighterStats('playerFighterStats', pStats);
-    renderFighterStats('enemyFighterStats', eStats);
+    renderFighterStats('playerFighterStats', pStats, playerMaxHp, true);
+    renderFighterStats('enemyFighterStats', eStats, enemyMaxHp, false);
     renderFightHand(pStats, eStats);
 
     // Determine who goes first this round
