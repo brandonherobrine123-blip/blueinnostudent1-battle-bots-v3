@@ -29,10 +29,13 @@
   var enemyActions = [];
   var fightRound = 0;
   var maxRounds = 3;
-  var playerPassed = false;
+  var playerWins = 0;
+  var enemyWins = 0;
   var gameActive = false;
   var playerMaxHp = 50;
   var enemyMaxHp = 50;
+  var playerBaseStats = null;  // stored for HP/ENG reset each round
+  var enemyBaseStats = null;
 
   // ---- Helpers ----
   function el(t, c, txt) {
@@ -134,7 +137,6 @@
     enemyAttached = [];
     enemyMaterials = [];
     fightRound = 0;
-    playerPassed = false;
 
     // Draw part cards — god card is player-only
     var normalPool = ASSETS.filter(function (a) { return a.type === 'card' && a.category !== 'God'; });
@@ -318,46 +320,59 @@
   function startFight() {
     showScreen('gameFight');
     fightRound = 1;
-    playerPassed = false;
+    playerWins = 0;
+    enemyWins = 0;
 
-    var playerStats = botStats(
+    playerBaseStats = botStats(
       playerAttached.map(function (x) { return x.asset; }),
       playerMaterials
     );
-    var enemyStats = botStats(
+    enemyBaseStats = botStats(
       enemyAttached.map(function (x) { return x.asset; }),
       enemyMaterials
     );
 
-    playerMaxHp = playerStats.hp;
-    enemyMaxHp = enemyStats.hp;
+    playerMaxHp = playerBaseStats.hp;
+    enemyMaxHp = enemyBaseStats.hp;
     var actionPool = ASSETS.filter(function (a) { return a.type === 'tile'; });
     var shuffled = shuffle(actionPool);
     playerActions = shuffled.slice(0, Math.min(15, shuffled.length));
     var shuffled2 = shuffle(actionPool);
     enemyActions = shuffled2.slice(0, Math.min(15, shuffled2.length));
 
-    // Render fight screen
-    renderFighterStats('playerFighterStats', playerStats, playerMaxHp, true);
-    renderFighterStats('enemyFighterStats', enemyStats, enemyMaxHp, false);
-
     document.getElementById('fightLog').innerHTML = '';
-    document.getElementById('roundInfo').textContent = 'Round 1 / 3';
-    document.getElementById('turnInfo').textContent = 'Your SPD: ' + playerStats.spd + ' | Enemy SPD: ' + enemyStats.spd;
+    log('🏆 BEST OF 3 — First to 2 round wins takes the match!', 'you');
 
-    // Determine who goes first
-    var playerFirst = playerStats.spd >= enemyStats.spd;
-    if (playerFirst) {
-      log('You go first! (higher SPD)', 'you');
-      renderFightHand(playerStats, enemyStats);
-    } else {
-      log('Enemy goes first! (higher SPD)', 'enemy');
-      renderFightHand(playerStats, enemyStats);
-      // Enemy takes first turn after a short delay
-      setTimeout(function () { enemyTurn(playerStats, enemyStats); }, 1000);
-    }
-
+    startRound(playerBaseStats, enemyBaseStats);
     gameActive = true;
+  }
+
+  function startRound(pTemplate, eTemplate) {
+    // Reset HP & ENG to full
+    var pStats = {};
+    var pKeys = Object.keys(pTemplate);
+    for (var k = 0; k < pKeys.length; k++) { pStats[pKeys[k]] = pTemplate[pKeys[k]]; }
+    var eStats = {};
+    var eKeys = Object.keys(eTemplate);
+    for (var k = 0; k < eKeys.length; k++) { eStats[eKeys[k]] = eTemplate[eKeys[k]]; }
+
+    renderFighterStats('playerFighterStats', pStats, playerMaxHp, true);
+    renderFighterStats('enemyFighterStats', eStats, enemyMaxHp, false);
+
+    document.getElementById('roundInfo').textContent =
+      'Round ' + fightRound + ' / 3  |  🟢 You: ' + playerWins + '  🔴 Enemy: ' + enemyWins;
+    document.getElementById('turnInfo').textContent =
+      'SPD: ' + pStats.spd + ' vs ' + eStats.spd + ' | First to 2 round wins';
+
+    var playerFirst = pStats.spd >= eStats.spd;
+    if (playerFirst) {
+      log('--- Round ' + fightRound + ' — You go first! ---', 'you');
+      renderFightHand(pStats, eStats);
+    } else {
+      log('--- Round ' + fightRound + ' — Enemy goes first! ---', 'enemy');
+      renderFightHand(pStats, eStats);
+      setTimeout(function () { enemyTurn(pStats, eStats); }, 1000);
+    }
   }
 
   function renderFighterStats(elId, stats, maxHp, isPlayer) {
@@ -439,8 +454,8 @@
       hand.appendChild(card);
     }
 
-    if (hand.children.length === 0 && !playerPassed) {
-      hand.appendChild(el('div', 'hand-card', 'No playable cards — pass by waiting for enemy.'));
+    if (hand.children.length === 0) {
+      hand.appendChild(el('div', 'hand-card', 'No playable cards — waiting for round to end.'));
     }
   }
 
@@ -464,7 +479,7 @@
     renderFightHand(pStats, eStats);
 
     if (eStats.hp <= 0) {
-      endGame('win', pStats, eStats);
+      winRound('player', pStats, eStats);
       return;
     }
 
@@ -475,6 +490,7 @@
   function enemyTurn(pStats, eStats) {
     if (!gameActive) return;
     if (eStats.hp <= 0) return;
+    if (pStats.hp <= 0) return;
 
     // Pick a random unplayed action
     var available = [];
@@ -487,7 +503,7 @@
 
     if (available.length === 0) {
       log('Enemy passes — no playable cards.', 'enemy');
-      advanceRound(pStats, eStats);
+      checkRoundEnd(pStats, eStats);
       return;
     }
 
@@ -506,11 +522,11 @@
     renderFighterStats('enemyFighterStats', eStats, enemyMaxHp, false);
 
     if (pStats.hp <= 0) {
-      endGame('lose', pStats, eStats);
+      winRound('enemy', pStats, eStats);
       return;
     }
 
-    // If both passed or all actions used, advance round
+    // If both passed or all actions used, end round by HP
     var pAvail = false;
     for (var j = 0; j < playerActions.length; j++) {
       if (!playerActions[j]._played) {
@@ -519,7 +535,7 @@
       }
     }
     if (!pAvail && available.length <= 1) {
-      advanceRound(pStats, eStats);
+      checkRoundEnd(pStats, eStats);
     } else {
       renderFightHand(pStats, eStats);
     }
@@ -546,37 +562,57 @@
     return dmg;
   }
 
-  function advanceRound(pStats, eStats) {
-    fightRound++;
-    if (fightRound > maxRounds) {
-      // Determine winner by HP
-      if (pStats.hp > eStats.hp) endGame('win', pStats, eStats);
-      else if (eStats.hp > pStats.hp) endGame('lose', pStats, eStats);
-      else {
-        // Tiebreaker: ENG
-        if (pStats.eng > eStats.eng) endGame('win', pStats, eStats);
-        else if (eStats.eng > pStats.eng) endGame('lose', pStats, eStats);
-        else endGame('draw', pStats, eStats);
+  function checkRoundEnd(pStats, eStats) {
+    // Round ended with no knockout — decide by HP
+    if (pStats.hp > eStats.hp) {
+      log('Round ends — you win by HP! (' + Math.max(0, pStats.hp) + ' vs ' + Math.max(0, eStats.hp) + ')', 'you');
+      winRound('player', pStats, eStats);
+    } else if (eStats.hp > pStats.hp) {
+      log('Round ends — enemy wins by HP! (' + Math.max(0, eStats.hp) + ' vs ' + Math.max(0, pStats.hp) + ')', 'enemy');
+      winRound('enemy', pStats, eStats);
+    } else {
+      // HP tie — ENG tiebreaker
+      if (pStats.eng > eStats.eng) {
+        log('HP tie! You win round by ENG tiebreaker.', 'you');
+        winRound('player', pStats, eStats);
+      } else if (eStats.eng > pStats.eng) {
+        log('HP tie! Enemy wins round by ENG tiebreaker.', 'enemy');
+        winRound('enemy', pStats, eStats);
+      } else {
+        log('Total tie! Sudden death — first hit wins next exchange.', 'you');
+        // Sudden death: both get 10 ENG, keep going in same round
+        pStats.eng += 10;
+        eStats.eng += 10;
+        renderFightHand(pStats, eStats);
       }
+    }
+  }
+
+  function winRound(winner, pStats, eStats) {
+    if (winner === 'player') {
+      playerWins++;
+      log('🏆 YOU WIN ROUND ' + fightRound + '! (' + playerWins + '-' + enemyWins + ')', 'you');
+    } else {
+      enemyWins++;
+      log('💀 Enemy wins Round ' + fightRound + '! (' + playerWins + '-' + enemyWins + ')', 'enemy');
+    }
+
+    document.getElementById('roundInfo').textContent =
+      'Round ' + fightRound + ' / 3  |  🟢 You: ' + playerWins + '  🔴 Enemy: ' + enemyWins;
+
+    if (playerWins >= 2) {
+      endGame('win', pStats, eStats);
+      return;
+    }
+    if (enemyWins >= 2) {
+      endGame('lose', pStats, eStats);
       return;
     }
 
-    // Recharge
-    pStats.eng += 10;
-    eStats.eng += 10;
-    log('--- Round ' + fightRound + ' / ' + maxRounds + ' --- +10 ENG each ---', 'you');
-    document.getElementById('roundInfo').textContent = 'Round ' + fightRound + ' / ' + maxRounds;
-    renderFighterStats('playerFighterStats', pStats, playerMaxHp, true);
-    renderFighterStats('enemyFighterStats', eStats, enemyMaxHp, false);
-    renderFightHand(pStats, eStats);
-
-    // Determine who goes first this round
-    if (pStats.spd >= eStats.spd) {
-      log('Your turn — you go first.', 'you');
-    } else {
-      log('Enemy goes first.', 'enemy');
-      setTimeout(function () { enemyTurn(pStats, eStats); }, 1000);
-    }
+    // Start next round
+    fightRound++;
+    log('━━━ Next round starting — HP & ENG reset ━━━', 'you');
+    startRound(playerBaseStats, enemyBaseStats);
   }
 
   function log(msg, cls) {
@@ -595,17 +631,17 @@
     var summary = document.getElementById('gameSummary');
 
     if (result === 'win') {
-      title.textContent = '🏆 You Win!';
+      title.textContent = '🏆 You Win the Match!';
       title.style.color = '#213F99';
-      summary.textContent = 'Your bot stands victorious! Enemy HP: ' + Math.max(0, eStats.hp) + ', Your HP: ' + Math.max(0, pStats.hp);
+      summary.textContent = 'Round score: ' + playerWins + ' - ' + enemyWins + '. Your bot dominates the arena!';
     } else if (result === 'lose') {
-      title.textContent = '💀 You Lose';
+      title.textContent = '💀 Enemy Wins the Match';
       title.style.color = '#c44';
-      summary.textContent = 'Your bot was scrapped. Enemy HP: ' + Math.max(0, eStats.hp) + ', Your HP: ' + Math.max(0, pStats.hp);
+      summary.textContent = 'Round score: ' + playerWins + ' - ' + enemyWins + '. Your bot goes to the scrap heap.';
     } else {
       title.textContent = '🤝 Draw!';
       title.style.color = '#888';
-      summary.textContent = 'Both bots still standing. Time for sudden death? Your HP: ' + Math.max(0, pStats.hp) + ', Enemy HP: ' + Math.max(0, eStats.hp);
+      summary.textContent = 'Somehow, impossibly, it ended even. Round score: ' + playerWins + ' - ' + enemyWins;
     }
   }
 
