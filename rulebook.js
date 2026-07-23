@@ -17,4 +17,7 @@ window.RULEBOOK = {
 
   // What each piece family is called in YOUR game — the gallery section headers.
   families: { card: 'Part Cards', token: 'Chassis Tokens', tile: 'Action Cards' },
+
+  // Lore — shown on the Rules page.
+  lore: 'In the year 2147, the Scrap Wars consumed the wastes. Engineers no longer built — they scavenged. From the rusted carcasses of fallen mechs, they forged new warriors. The arena is the only law. Two bots enter. One leaves standing. Build yours in secret. Reveal it in glory. Win in three rounds — or be scrapped.',
 };

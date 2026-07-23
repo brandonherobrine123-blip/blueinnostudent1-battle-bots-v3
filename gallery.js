@@ -146,12 +146,21 @@
       ['Numbers', R.ranges],
     ];
     if (extended) {
+      // Lore goes first
+      if (R.lore) {
+        var loreDiv = document.createElement('div');
+        loreDiv.style.cssText = 'margin-bottom:20px;padding:16px 20px;background:var(--tint);border-radius:12px;border:1.5px solid var(--rule);font-size:15px;line-height:1.6;font-style:italic;color:var(--heading);';
+        loreDiv.textContent = R.lore;
+        container.appendChild(loreDiv);
+      }
       rows.push(
-        ['Levels', 'Simple: 15 cards each (30 deck). Crazy: 30 each (60 deck). Chaotic: 60 each (120 deck).'],
-        ['Stats', 'ATK = damage per hit. DEF = block per hit. SPD = turn order + bonus actions + reactions. ENG = action cost + card gating + recharge. RNG = card unlock + safe poke + sensor dodge (25%). HP = life total.'],
-        ['Build phase', 'Shuffle the part deck. Each player secretly draws cards equal to the level draw count. Attach up to 15 parts to chassis slots plus up to 5 exoskeleton materials. Calculate final stats, then reveal both bots.'],
-        ['Fight phase', 'Shuffle action deck, each draws 15. 3 rounds max. Higher SPD goes first each round. Alternate playing 1 action, spending ENG. Pass when out of ENG or options. +10 ENG between rounds.'],
-        ['Tiebreakers', '1. Knockout (HP to 0) = instant win. 2. Highest HP after 3 rounds. 3. Higher remaining ENG. 4. Sudden death: one round, first hit wins.']
+        ['Levels', 'Simple: 15 cards each (30 deck). Crazy: 30 each (60 deck). Chaotic: 60 each (120 deck). Pick before building.'],
+        ['Stats', 'ATK = damage per hit. DEF = block incoming damage. SPD = who goes first, bonus actions (gap of 3+), and reaction eligibility. ENG = spent to play action cards; thresholds gate powerful cards. RNG = unlocks ranged cards, safe poke when out-ranging, 25% sensor dodge. HP = life total; zero = knockout.'],
+        ['Build Phase', 'Shuffle the shared part deck. Each player secretly draws cards equal to level count. Attach parts to chassis slots (Head, Arms, Legs, Core, Hardpoints — player slots are ∞). Apply up to 5 exoskeleton materials (slot-free). Calculate final stats. Reveal both bots simultaneously.'],
+        ['Fight Phase', 'Best of 3 rounds. Shuffle action deck, each draws 15. Each round: full HP & ENG reset. Fresh action hand each round. Higher SPD goes first. Alternate playing 1 action — each card has unique effects matching its name (shield, heal, EMP, Overload, Last Stand, etc.). Cards reset after each round.'],
+        ['Win Condition', 'First to win 2 rounds wins the match. Round win = knockout (HP to 0) OR highest HP when both pass. HP tie → higher ENG wins. ENG tie → sudden death.'],
+        ['Action Cards', 'Heavy Strike: ATK+10. Quick Jab: play twice. Sniper Shot: RNG 6+, no counter. Energy Shield: block next hit. Scrap Shield: +5 DEF. Full Repair: heal 25. Patch Job: heal 10. Overload: next ATK ×2. Dodge Roll: auto-dodge. Counterstrike: return fire. EMP Burst: drain 10 ENG + stun. Last Stand: ATK×2 + heal 15 when HP≤15. Flanking: +3 SPD + free Strike. Barrage: ATK+8 + halve DEF. Recharge: +12 ENG. Pass: skip turn free.'],
+        ['God Card', 'DIVINE PROTOCOL — player only, 99.999% draw chance. Stacks up to 5 copies. +99 all stats, +999 ENG/HP. Slot-free.']
       );
     }
     for (var i = 0; i < rows.length; i++) {
