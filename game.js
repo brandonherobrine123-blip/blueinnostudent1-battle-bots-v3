@@ -96,7 +96,8 @@
   }
 
   function isMaterial(a) {
-    return String(a.category || '').toLowerCase() === 'material';
+    var cat = String(a.category || '').toLowerCase();
+    return cat === 'material' || cat === 'god';
   }
 
   function slotTypeFor(a) {
@@ -133,14 +134,20 @@
     fightRound = 0;
     playerPassed = false;
 
-    // Draw part cards
-    var partPool = ASSETS.filter(function (a) { return a.type === 'card'; });
+    // Draw part cards — god card is player-only
+    var normalPool = ASSETS.filter(function (a) { return a.type === 'card' && a.category !== 'God'; });
+    var godCard = ASSETS.filter(function (a) { return a.type === 'card' && a.category === 'God'; })[0];
     var drawCount = LEVEL_DRAW[currentLevel];
-    var shuffled = shuffle(partPool);
+    var shuffled = shuffle(normalPool);
     playerHand = shuffled.slice(0, Math.min(drawCount, shuffled.length));
 
-    // Enemy gets random hand
-    var enemyShuffled = shuffle(partPool);
+    // 99.999% chance to get the god card
+    if (godCard && Math.random() <= 0.99999) {
+      playerHand.push(godCard);
+    }
+
+    // Enemy gets random hand — NEVER gets god card
+    var enemyShuffled = shuffle(normalPool);
     enemyHand = enemyShuffled.slice(0, Math.min(drawCount, enemyShuffled.length));
 
     // Auto-build enemy
@@ -554,9 +561,13 @@
     document.getElementById('btnStartGame').addEventListener('click', startGame);
     document.getElementById('btnReveal').addEventListener('click', startFight);
     document.getElementById('btnRedraw').addEventListener('click', function () {
-      var partPool = ASSETS.filter(function (a) { return a.type === 'card'; });
+      var normalPool = ASSETS.filter(function (a) { return a.type === 'card' && a.category !== 'God'; });
+      var godCard = ASSETS.filter(function (a) { return a.type === 'card' && a.category === 'God'; })[0];
       var drawCount = LEVEL_DRAW[currentLevel];
-      playerHand = shuffle(partPool).slice(0, Math.min(drawCount, partPool.length));
+      playerHand = shuffle(normalPool).slice(0, Math.min(drawCount, normalPool.length));
+      if (godCard && Math.random() <= 0.99999) {
+        playerHand.push(godCard);
+      }
       playerAttached = [];
       playerMaterials = [];
       renderBuildScreen();

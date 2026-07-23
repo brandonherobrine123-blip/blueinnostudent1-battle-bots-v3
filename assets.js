@@ -101,6 +101,10 @@ window.ASSETS = [
   { id: '040', type: 'card', name: 'Flak Cannon', category: 'Arm · Weapon', cost: 4, atk: 7, def: 0, spd: 0, eng: 0, rng: 4, hp: 0,
     effect: 'Unlocks: Weapon actions. Cannot be sensor-dodged.', flavor: 'Covers the whole sky.' },
 
+  // ---- GOD CARD (player only, 99.999% draw chance) ----
+  { id: '099', type: 'card', name: 'DIVINE PROTOCOL', category: 'God', cost: 0, atk: 99, def: 99, spd: 99, eng: 999, rng: 99, hp: 999,
+    effect: 'GOD CARD — Player only. Slot-free. All stats +99 (ENG +999). Unlocks ALL action categories. You are inevitable.', flavor: 'The dev left a backdoor. You found it.' },
+
   // ==========================================
   // CHASSIS TOKENS
   // ==========================================
