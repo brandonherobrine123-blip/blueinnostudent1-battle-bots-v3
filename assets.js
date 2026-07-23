@@ -147,4 +147,6 @@ window.ASSETS = [
     effect: 'Deal ATK + 8 damage. Enemy DEF is halved. Requires: Weapon unlocked. Min ENG: 18.', flavor: 'Everything. Fire everything.', image: 'assets/images/tiles/214-pixel-art-16-bit.jpg' },
   { id: '215', type: 'tile', name: 'Recharge', category: 'Engine', cost: 0, engGain: 12,
     effect: 'Gain 12 ENG. Requires: Engine unlocked.', flavor: 'Deep breath.', image: 'assets/images/tiles/215-pixel-art-16-bit.jpg' },
+  { id: '216', type: 'tile', name: 'Pass', category: 'Command', cost: 0, pass: true,
+    effect: 'Skip your turn. Costs nothing. Sometimes waiting is the smartest move.', flavor: '...' },
 ];

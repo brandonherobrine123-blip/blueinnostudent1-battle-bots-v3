@@ -546,6 +546,9 @@
     if (action.dodge) {
       msg += ' — next attack auto-dodged!';
     }
+    if (action.pass) {
+      msg += ' — turn skipped.';
+    }
 
     // Damage dealing
     if (typeof action.dmg === 'number' || typeof action.mult === 'number') {
