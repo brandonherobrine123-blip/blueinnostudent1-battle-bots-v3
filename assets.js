@@ -9,9 +9,9 @@ window.ASSETS = [
 
   // ---- HEAD (1 slot) ----
   { id: '001', type: 'card', name: 'Sensor Array', category: 'Head · Sensor', cost: 2, atk: 0, def: 0, spd: 2, eng: 0, rng: 5, hp: 2,
-    effect: 'Unlocks: Precision actions. 25% sensor dodge while in range.', flavor: 'Sees you before you see it.' },
+    effect: 'Unlocks: Precision actions. 25% sensor dodge while in range.', flavor: 'Sees you before you see it.', image: 'assets/images/cards/001-pixel-art-16-bit.jpg' },
   { id: '002', type: 'card', name: 'Targeting HUD', category: 'Head · Precision', cost: 2, atk: 4, def: 0, spd: 1, eng: 0, rng: 3, hp: 0,
-    effect: 'Unlocks: Strike, Precision actions.', flavor: 'Red means dead.' },
+    effect: 'Unlocks: Strike, Precision actions.', flavor: 'Red means dead.', image: 'assets/images/cards/002-pixel-art-16-bit.jpg' },
   { id: '003', type: 'card', name: 'Commander Crest', category: 'Head · Command', cost: 3, atk: 0, def: 1, spd: 3, eng: 8, rng: 1, hp: 3,
     effect: 'Unlocks: Command actions. +1 bonus action if your SPD beats theirs by only 2 (instead of 3).', flavor: 'One mind, two fists.' },
   { id: '004', type: 'card', name: 'Radar Dome', category: 'Head · Sensor', cost: 3, atk: 0, def: 2, spd: 0, eng: 0, rng: 7, hp: 4,
@@ -19,11 +19,11 @@ window.ASSETS = [
 
   // ---- ARM (2 slots) ----
   { id: '005', type: 'card', name: 'Rocket Fist', category: 'Arm · Strike', cost: 3, atk: 9, def: 0, spd: 1, eng: 0, rng: 0, hp: 2,
-    effect: 'Unlocks: Strike actions.', flavor: 'Punch first, punch last.' },
+    effect: 'Unlocks: Strike actions.', flavor: 'Punch first, punch last.', image: 'assets/images/cards/005-pixel-art-16-bit.jpg' },
   { id: '006', type: 'card', name: 'Laser Cannon', category: 'Arm · Weapon', cost: 4, atk: 6, def: 1, spd: 0, eng: 0, rng: 5, hp: 1,
-    effect: 'Unlocks: Weapon, Strike actions.', flavor: 'Point. Click. Scrap.' },
+    effect: 'Unlocks: Weapon, Strike actions.', flavor: 'Point. Click. Scrap.', image: 'assets/images/cards/006-pixel-art-16-bit.jpg' },
   { id: '007', type: 'card', name: 'Shield Arm', category: 'Arm · Defense', cost: 3, atk: 1, def: 8, spd: 0, eng: 0, rng: 0, hp: 3,
-    effect: 'Unlocks: Defense actions. Negate one reaction attack per round.', flavor: 'Come at it.' },
+    effect: 'Unlocks: Defense actions. Negate one reaction attack per round.', flavor: 'Come at it.', image: 'assets/images/cards/007-pixel-art-16-bit.jpg' },
   { id: '008', type: 'card', name: 'Hydraulic Claw', category: 'Arm · Strike', cost: 3, atk: 5, def: 2, spd: 2, eng: 0, rng: 0, hp: 1,
     effect: 'Unlocks: Strike actions. Can play one Strike at half ENG cost per round.', flavor: 'Crunch.' },
   { id: '009', type: 'card', name: 'Repair Arm', category: 'Arm · Repair', cost: 2, atk: 2, def: 3, spd: 1, eng: 5, rng: 0, hp: 4,
@@ -33,9 +33,9 @@ window.ASSETS = [
 
   // ---- LEG (2 slots) ----
   { id: '011', type: 'card', name: 'Rocket Thrusters', category: 'Leg · Speed', cost: 3, atk: 0, def: 0, spd: 6, eng: 2, rng: 0, hp: 1,
-    effect: 'Unlocks: Speed actions. Always strike first in round 1 regardless of SPD.', flavor: 'Already behind you.' },
+    effect: 'Unlocks: Speed actions. Always strike first in round 1 regardless of SPD.', flavor: 'Already behind you.', image: 'assets/images/cards/011-pixel-art-16-bit.jpg' },
   { id: '012', type: 'card', name: 'Tank Treads', category: 'Leg · Armor', cost: 4, atk: 0, def: 5, spd: 0, eng: 0, rng: 0, hp: 10,
-    effect: 'Unlocks: Defense actions. Cannot be knocked back or interrupted.', flavor: 'Slow. Steady. Unstoppable.' },
+    effect: 'Unlocks: Defense actions. Cannot be knocked back or interrupted.', flavor: 'Slow. Steady. Unstoppable.', image: 'assets/images/cards/012-pixel-art-16-bit.jpg' },
   { id: '013', type: 'card', name: 'Spring Legs', category: 'Leg · Speed', cost: 2, atk: 0, def: 1, spd: 4, eng: 0, rng: 1, hp: 2,
     effect: 'Unlocks: Speed actions. Reaction cards cost 2 less ENG.', flavor: 'Boing — and it is gone.' },
   { id: '014', type: 'card', name: 'Anchor Legs', category: 'Leg · Armor', cost: 3, atk: 2, def: 6, spd: 0, eng: 0, rng: 0, hp: 6,
@@ -43,17 +43,17 @@ window.ASSETS = [
 
   // ---- CORE (1 slot) ----
   { id: '015', type: 'card', name: 'Fusion Core', category: 'Core · Engine', cost: 4, atk: 2, def: 0, spd: 0, eng: 18, rng: 0, hp: 3,
-    effect: 'Unlocks: Engine actions. +5 ENG per recharge instead of +10 if ENG is below 10.', flavor: 'A tiny sun in a can.' },
+    effect: 'Unlocks: Engine actions. +5 ENG per recharge instead of +10 if ENG is below 10.', flavor: 'A tiny sun in a can.', image: 'assets/images/cards/015-pixel-art-16-bit.jpg' },
   { id: '016', type: 'card', name: 'Overclock Core', category: 'Core · Boost', cost: 3, atk: 4, def: 0, spd: 3, eng: 0, rng: 0, hp: 0,
-    effect: 'Unlocks: Boost actions. First action each round costs 0 ENG.', flavor: 'Runs hot, wins fast.' },
+    effect: 'Unlocks: Boost actions. First action each round costs 0 ENG.', flavor: 'Runs hot, wins fast.', image: 'assets/images/cards/016-pixel-art-16-bit.jpg' },
   { id: '017', type: 'card', name: 'Titanium Heart', category: 'Core · Armor', cost: 4, atk: 0, def: 4, spd: 0, eng: 0, rng: 0, hp: 22,
-    effect: 'Unlocks: Defense actions. Heal 5 HP between rounds.', flavor: 'It does not stop. It does not break.' },
+    effect: 'Unlocks: Defense actions. Heal 5 HP between rounds.', flavor: 'It does not stop. It does not break.', image: 'assets/images/cards/017-pixel-art-16-bit.jpg' },
   { id: '018', type: 'card', name: 'Nano Core', category: 'Core · Support', cost: 3, atk: 1, def: 2, spd: 1, eng: 8, rng: 0, hp: 8,
     effect: 'Unlocks: Repair actions. All Repair actions heal +5 extra HP.', flavor: 'Mends itself mid-battle.' },
 
   // ---- HARDPOINT (9 slots, any part fits) ----
   { id: '019', type: 'card', name: 'Armor Plate', category: 'Hardpoint · Armor', cost: 2, atk: 0, def: 5, spd: 0, eng: 0, rng: 0, hp: 6,
-    effect: 'Unlocks: Defense actions.', flavor: 'Extra layer, extra life.' },
+    effect: 'Unlocks: Defense actions.', flavor: 'Extra layer, extra life.', image: 'assets/images/cards/019-pixel-art-16-bit.jpg' },
   { id: '020', type: 'card', name: 'Ammo Pack', category: 'Hardpoint · Supply', cost: 2, atk: 3, def: 0, spd: 0, eng: 6, rng: 1, hp: 2,
     effect: 'Unlocks: Weapon actions.', flavor: 'More dakka.' },
   { id: '021', type: 'card', name: 'Coolant Vent', category: 'Hardpoint · Engine', cost: 2, atk: 0, def: 2, spd: 1, eng: 8, rng: 0, hp: 1,
@@ -73,7 +73,7 @@ window.ASSETS = [
 
   // ---- EXOSKELETON MATERIALS (slot-free, apply up to 5) ----
   { id: '028', type: 'card', name: 'Titanium Plating', category: 'Material', cost: 1, atk: 0, def: 3, spd: 0, eng: 0, rng: 0, hp: 15,
-    effect: 'Material — slot-free. +3 DEF, +15 HP.', flavor: 'Wrapped in star-hull alloy.' },
+    effect: 'Material — slot-free. +3 DEF, +15 HP.', flavor: 'Wrapped in star-hull alloy.', image: 'assets/images/cards/028-pixel-art-16-bit.jpg' },
   { id: '029', type: 'card', name: 'Nano Weave', category: 'Material', cost: 1, atk: 0, def: 5, spd: 2, eng: 0, rng: 0, hp: 3,
     effect: 'Material — slot-free. +5 DEF, +2 SPD.', flavor: 'Thin as silk, hard as diamond.' },
   { id: '030', type: 'card', name: 'Coolant Mesh', category: 'Material', cost: 1, atk: 0, def: 0, spd: 0, eng: 12, rng: 0, hp: 5,
@@ -103,41 +103,41 @@ window.ASSETS = [
 
   // ---- GOD CARD (player only, 99.999% draw chance) ----
   { id: '099', type: 'card', name: 'DIVINE PROTOCOL', category: 'God', cost: 0, atk: 99, def: 99, spd: 99, eng: 999, rng: 99, hp: 999,
-    effect: 'GOD CARD — Player only. Slot-free. All stats +99 (ENG +999). Unlocks ALL action categories. You are inevitable.', flavor: 'The dev left a backdoor. You found it.' },
+    effect: 'GOD CARD — Player only. Slot-free. All stats +99 (ENG +999). Unlocks ALL action categories. You are inevitable.', flavor: 'The dev left a backdoor. You found it.', image: 'assets/images/cards/099-pixel-art-16-bit.jpg' },
 
   // ==========================================
   // CHASSIS TOKENS
   // ==========================================
   { id: '101', type: 'token', name: 'Standard Chassis', category: 'Chassis', hp: 50, atk: 5, def: 0, spd: 3, eng: 30, rng: 3,
-    effect: 'Slots: 1 Head, 2 Arms, 2 Legs, 1 Core, 9 Hardpoints. Up to 5 materials. Attach up to 15 parts total.', flavor: 'Bare frame. Infinite potential.' },
+    effect: 'Slots: 1 Head, 2 Arms, 2 Legs, 1 Core, 9 Hardpoints. Up to 5 materials. Attach up to 15 parts total.', flavor: 'Bare frame. Infinite potential.', image: 'assets/images/tokens/101-pixel-art-16-bit.jpg' },
   { id: '102', type: 'token', name: 'Heavy Chassis', category: 'Chassis', hp: 65, atk: 5, def: 3, spd: 2, eng: 25, rng: 2,
-    effect: 'Slots: 1 Head, 2 Arms, 2 Legs, 1 Core, 7 Hardpoints. Up to 4 materials. Built to take hits.', flavor: 'Thicker frame, fewer slots — but it will not fall.' },
+    effect: 'Slots: 1 Head, 2 Arms, 2 Legs, 1 Core, 7 Hardpoints. Up to 4 materials. Built to take hits.', flavor: 'Thicker frame, fewer slots — but it will not fall.', image: 'assets/images/tokens/102-pixel-art-16-bit.jpg' },
 
   // ==========================================
   // ACTION CARDS (type: tile in the gallery, ENG cost stored in cost field)
   // ==========================================
   { id: '201', type: 'tile', name: 'Heavy Strike', category: 'Strike', cost: 8,
-    effect: 'Deal ATK + 10 damage. Requires: Strike unlocked. Min ENG: 15.', flavor: 'Put everything into it.' },
+    effect: 'Deal ATK + 10 damage. Requires: Strike unlocked. Min ENG: 15.', flavor: 'Put everything into it.', image: 'assets/images/tiles/201-pixel-art-16-bit.jpg' },
   { id: '202', type: 'tile', name: 'Quick Jab', category: 'Strike', cost: 3,
     effect: 'Deal ATK damage. Can play twice in one turn. Requires: Strike unlocked.', flavor: 'One, two.' },
   { id: '203', type: 'tile', name: 'Sniper Shot', category: 'Precision', cost: 6,
-    effect: 'Deal ATK + 5 damage. Requires: Precision unlocked, RNG 6+. Cannot be retaliated.', flavor: 'From across the arena.' },
+    effect: 'Deal ATK + 5 damage. Requires: Precision unlocked, RNG 6+. Cannot be retaliated.', flavor: 'From across the arena.', image: 'assets/images/tiles/203-pixel-art-16-bit.jpg' },
   { id: '204', type: 'tile', name: 'Energy Shield', category: 'Defense', cost: 5,
-    effect: 'Block all damage from the next attack. Requires: Defense unlocked.', flavor: 'Not today.' },
+    effect: 'Block all damage from the next attack. Requires: Defense unlocked.', flavor: 'Not today.', image: 'assets/images/tiles/204-pixel-art-16-bit.jpg' },
   { id: '205', type: 'tile', name: 'Scrap Shield', category: 'Defense', cost: 2,
     effect: 'Reduce incoming damage by DEF + 5 for one hit. Requires: Defense unlocked.', flavor: 'Better than nothing.' },
   { id: '206', type: 'tile', name: 'Full Repair', category: 'Repair', cost: 10,
-    effect: 'Restore 25 HP. Requires: Repair unlocked. Min ENG: 20.', flavor: 'Good as new.' },
+    effect: 'Restore 25 HP. Requires: Repair unlocked. Min ENG: 20.', flavor: 'Good as new.', image: 'assets/images/tiles/206-pixel-art-16-bit.jpg' },
   { id: '207', type: 'tile', name: 'Patch Job', category: 'Repair', cost: 4,
     effect: 'Restore 10 HP. Requires: Repair unlocked.', flavor: 'Some tape, some hope.' },
   { id: '208', type: 'tile', name: 'Overload', category: 'Boost', cost: 7,
     effect: 'Double ATK for one attack this turn. Requires: Boost unlocked.', flavor: 'Run hot, hit harder.' },
   { id: '209', type: 'tile', name: 'Dodge Roll', category: 'Speed', cost: 3,
-    effect: 'Reaction — avoid one attack entirely. Requires: Speed unlocked. SPD 3+.', flavor: 'Too slow.' },
+    effect: 'Reaction — avoid one attack entirely. Requires: Speed unlocked. SPD 3+.', flavor: 'Too slow.', image: 'assets/images/tiles/209-pixel-art-16-bit.jpg' },
   { id: '210', type: 'tile', name: 'Counterstrike', category: 'Strike', cost: 6,
     effect: 'Reaction — after taking a hit, deal ATK + 3 back. Requires: Strike unlocked, SPD 4+.', flavor: 'Your turn, my turn.' },
   { id: '211', type: 'tile', name: 'EMP Burst', category: 'Precision', cost: 5,
-    effect: 'Enemy loses 10 ENG and skips next action. Requires: Precision unlocked.', flavor: 'System reboot.' },
+    effect: 'Enemy loses 10 ENG and skips next action. Requires: Precision unlocked.', flavor: 'System reboot.', image: 'assets/images/tiles/211-pixel-art-16-bit.jpg' },
   { id: '212', type: 'tile', name: 'Last Stand', category: 'Command', cost: 12,
     effect: 'If HP is under 15: deal ATK × 2 and heal 15 HP. Once per fight. Requires: Command unlocked. Min ENG: 25.', flavor: 'Not done yet.' },
   { id: '213', type: 'tile', name: 'Flanking Maneuver', category: 'Speed', cost: 4,
