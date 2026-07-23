@@ -405,43 +405,36 @@
     var elm = document.getElementById(elId);
     elm.innerHTML = '';
 
-    // Bot icon
+    // Full-body bot image — changes with health
+    var hpPct = maxHp > 0 ? (stats.hp / maxHp) : 0;
+    var botImg;
+    if (isPlayer) {
+      if (hpPct > 0.5) botImg = 'assets/images/tokens/103-pixel-art-16-bit.jpg';
+      else if (hpPct > 0.25) botImg = 'assets/images/tokens/104-pixel-art-16-bit.jpg';
+      else botImg = 'assets/images/tokens/105-pixel-art-16-bit.jpg';
+    } else {
+      if (hpPct > 0.5) botImg = 'assets/images/tokens/106-pixel-art-16-bit.jpg';
+      else if (hpPct > 0.25) botImg = 'assets/images/tokens/107-pixel-art-16-bit.jpg';
+      else botImg = 'assets/images/tokens/108-pixel-art-16-bit.jpg';
+    }
     var icon = el('div', 'bot-icon');
-    icon.innerHTML = isPlayer ?
-      '<svg viewBox="0 0 64 64" fill="none" stroke="#213F99" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="64" height="64">' +
-        '<rect x="14" y="8" width="36" height="48" rx="6"/>' +
-        '<circle cx="26" cy="26" r="4" fill="#45ACF4" stroke="none"/>' +
-        '<circle cx="38" cy="26" r="4" fill="#45ACF4" stroke="none"/>' +
-        '<rect x="22" y="38" width="20" height="4" rx="2"/>' +
-        '<line x1="8" y1="20" x2="14" y2="20"/>' +
-        '<line x1="8" y1="28" x2="14" y2="28"/>' +
-        '<line x1="50" y1="20" x2="56" y2="20"/>' +
-        '<line x1="50" y1="28" x2="56" y2="28"/>' +
-        '<path d="M22 56l-4 6h28l-4-6"/>' +
-        '<circle cx="32" cy="6" r="3" fill="#45ACF4" stroke="none"/>' +
-      '</svg>' :
-      '<svg viewBox="0 0 64 64" fill="none" stroke="#c44" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="64" height="64">' +
-        '<rect x="10" y="10" width="44" height="44" rx="8"/>' +
-        '<circle cx="24" cy="28" r="5" fill="#c44" stroke="none"/>' +
-        '<circle cx="40" cy="28" r="5" fill="#c44" stroke="none"/>' +
-        '<rect x="18" y="42" width="28" height="6" rx="2"/>' +
-        '<line x1="6" y1="22" x2="14" y2="22"/>' +
-        '<line x1="50" y1="22" x2="58" y2="22"/>' +
-        '<line x1="6" y1="34" x2="14" y2="34"/>' +
-        '<line x1="50" y1="34" x2="58" y2="34"/>' +
-        '<path d="M16 54l-4 6h40l-4-6"/>' +
-        '<line x1="32" y1="2" x2="32" y2="10"/>' +
-        '<circle cx="32" cy="2" r="4" fill="#c44" stroke="none"/>' +
-      '</svg>';
+    var img = document.createElement('img');
+    img.src = botImg;
+    img.alt = isPlayer ? 'Your Bot' : 'Enemy Bot';
+    img.style.width = '96px';
+    img.style.height = '96px';
+    img.style.objectFit = 'contain';
+    img.style.imageRendering = 'pixelated';
+    icon.appendChild(img);
     elm.appendChild(icon);
 
     // HP bar
-    var hpPct = maxHp > 0 ? Math.max(0, Math.round((stats.hp / maxHp) * 100)) : 0;
+    var hpBarPct = maxHp > 0 ? Math.max(0, Math.round((stats.hp / maxHp) * 100)) : 0;
     var hpBar = el('div', 'hp-bar-wrap');
     var barFill = el('div', 'hp-bar-fill');
-    barFill.style.width = hpPct + '%';
-    if (hpPct <= 25) barFill.classList.add('critical');
-    else if (hpPct <= 50) barFill.classList.add('warning');
+    barFill.style.width = hpBarPct + '%';
+    if (hpBarPct <= 25) barFill.classList.add('critical');
+    else if (hpBarPct <= 50) barFill.classList.add('warning');
     hpBar.appendChild(barFill);
     var hpLabel = el('div', 'hp-bar-label', 'HP: ' + Math.max(0, stats.hp) + ' / ' + maxHp);
     hpBar.appendChild(hpLabel);
