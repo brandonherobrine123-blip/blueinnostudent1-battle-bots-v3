@@ -34,8 +34,21 @@
   var gameActive = false;
   var playerMaxHp = 50;
   var enemyMaxHp = 50;
-  var playerBaseStats = null;  // stored for HP/ENG reset each round
+  var playerBaseStats = null;
   var enemyBaseStats = null;
+
+  // Combat state — temporary effects
+  var playerShielded = false;
+  var enemyShielded = false;
+  var playerAtkMult = 1;
+  var enemyAtkMult = 1;
+  var playerDefExtra = 0;
+  var enemyDefExtra = 0;
+  var playerSpdBonus = 0;
+  var enemySkipNext = false;
+  var playerSkipNext = false;
+  var playerFreeStrike = false;
+  var lastStandUsed = false;
 
   // ---- Helpers ----
   function el(t, c, txt) {
@@ -334,6 +347,12 @@
 
     playerMaxHp = playerBaseStats.hp;
     enemyMaxHp = enemyBaseStats.hp;
+    // Reset combat state
+    playerShielded = false; enemyShielded = false;
+    playerAtkMult = 1; enemyAtkMult = 1;
+    playerDefExtra = 0; enemyDefExtra = 0;
+    playerSpdBonus = 0; enemySkipNext = false; playerSkipNext = false;
+    playerFreeStrike = false; lastStandUsed = false;
     var actionPool = ASSETS.filter(function (a) { return a.type === 'tile'; });
     var shuffled = shuffle(actionPool);
     playerActions = shuffled.slice(0, Math.min(15, shuffled.length));
@@ -348,6 +367,13 @@
   }
 
   function startRound(pTemplate, eTemplate) {
+    // Reset temporary per-round state
+    playerShielded = false; enemyShielded = false;
+    playerAtkMult = 1; enemyAtkMult = 1;
+    playerDefExtra = 0; enemyDefExtra = 0;
+    playerSpdBonus = 0; enemySkipNext = false; playerSkipNext = false;
+    playerFreeStrike = false;
+
     // Reset HP & ENG to full
     var pStats = {};
     var pKeys = Object.keys(pTemplate);
@@ -461,18 +487,84 @@
 
   function playAction(idx, pStats, eStats) {
     if (!gameActive) return;
+    if (playerSkipNext) { playerSkipNext = false; log('You are stunned — turn skipped!', 'you'); setTimeout(function () { enemyTurn(pStats, eStats); }, 600); return; }
     var action = playerActions[idx];
     if (!action || action._played) return;
-    var cost = typeof action.cost === 'number' ? action.cost : 0;
+    var cost = (playerFreeStrike && String(action.category||'').toLowerCase() === 'strike') ? 0 : (typeof action.cost === 'number' ? action.cost : 0);
     if (pStats.eng < cost) { log('Not enough ENG!', 'you'); return; }
+    if (action.minEng && pStats.eng < action.minEng) { log('Need ' + action.minEng + ' ENG minimum!', 'you'); return; }
+    if (action.minRng && pStats.rng < action.minRng) { log('Need RNG ' + action.minRng + '+!', 'you'); return; }
+    if (action.minSpd && (pStats.spd + playerSpdBonus) < action.minSpd) { log('Need SPD ' + action.minSpd + '+!', 'you'); return; }
+    if (action.minHp && pStats.hp > action.minHp) { log('HP must be ≤ ' + action.minHp + ' for Last Stand!', 'you'); return; }
+    if (action.onceOnly && lastStandUsed) { log('Already used this fight!', 'you'); return; }
 
     pStats.eng -= cost;
     action._played = true;
+    if (action.onceOnly) lastStandUsed = true;
+    playerFreeStrike = false;
+    playerAtkMult = 1;  // reset after each attack
 
-    var dmg = calcDamage(pStats, eStats, action);
-    eStats.hp -= dmg;
-    log('You play ' + action.name + ' — ' + dmg + ' damage! (ENG: ' + pStats.eng + ')', 'you');
-    log('Enemy HP: ' + Math.max(0, eStats.hp), 'enemy');
+    var msg = 'You play ' + action.name;
+
+    // ---- Resolve card effects ----
+    if (action.shield) {
+      playerShielded = true;
+      msg += ' — Energy Shield active!';
+    }
+    if (action.defBoost) {
+      playerDefExtra = action.defBoost;
+      msg += ' — +' + action.defBoost + ' DEF this turn!';
+    }
+    if (action.heal) {
+      pStats.hp = Math.min(playerMaxHp, pStats.hp + action.heal);
+      msg += ' — healed ' + action.heal + ' HP!';
+    }
+    if (action.atkBoost) {
+      playerAtkMult = action.atkBoost;
+      msg += ' — ATK ×' + action.atkBoost + ' for next attack!';
+    }
+    if (action.engGain) {
+      pStats.eng += action.engGain;
+      msg += ' — gained ' + action.engGain + ' ENG!';
+    }
+    if (action.engDrain) {
+      eStats.eng = Math.max(0, eStats.eng - action.engDrain);
+      msg += ' — drained ' + action.engDrain + ' enemy ENG!';
+    }
+    if (action.skipEnemy) {
+      enemySkipNext = true;
+      msg += ' — enemy skips next turn!';
+    }
+    if (action.spdBonus) {
+      playerSpdBonus += action.spdBonus;
+      msg += ' — +' + action.spdBonus + ' SPD!';
+    }
+    if (action.freeStrike) {
+      playerFreeStrike = true;
+      msg += ' — next Strike costs 0 ENG!';
+    }
+    if (action.dodge) {
+      msg += ' — next attack auto-dodged!';
+    }
+
+    // Damage dealing
+    if (typeof action.dmg === 'number' || typeof action.mult === 'number') {
+      var dmg = resolveDamage(pStats, eStats, action, playerAtkMult);
+      if (enemyShielded) {
+        enemyShielded = false;
+        msg += ' — BLOCKED by enemy shield!';
+      } else {
+        eStats.hp -= dmg;
+        msg += ' — ' + dmg + ' damage!';
+      }
+    }
+
+    msg += ' (ENG: ' + pStats.eng + ')';
+    log(msg, 'you');
+    log('Enemy HP: ' + Math.max(0, eStats.hp) + ' | Enemy ENG: ' + eStats.eng, 'enemy');
+
+    // Reset temp def boost after attack
+    playerDefExtra = 0;
 
     renderFighterStats('playerFighterStats', pStats, playerMaxHp, true);
     renderFighterStats('enemyFighterStats', eStats, enemyMaxHp, false);
@@ -483,8 +575,21 @@
       return;
     }
 
-    // Enemy turn
     setTimeout(function () { enemyTurn(pStats, eStats); }, 800);
+  }
+
+  function resolveDamage(attacker, defender, action, atkMult) {
+    var baseAtk = attacker.atk * (atkMult || 1);
+    var dmgBonus = action.dmg || 0;
+    var mult = action.mult || 1;
+    var raw = (baseAtk * mult) + dmgBonus;
+    var def = defender.def;
+    if (action.halveDef) def = Math.floor(def / 2);
+    var blocked = Math.min(def, Math.floor(raw * 0.5));
+    var dmg = Math.max(1, raw - blocked);
+    if (attacker.rng > defender.rng && !action.noCounter) dmg += 3;
+    if (action.noCounter) dmg += 2; // sniper bonus for no retaliation
+    return dmg;
   }
 
   function enemyTurn(pStats, eStats) {
@@ -492,7 +597,8 @@
     if (eStats.hp <= 0) return;
     if (pStats.hp <= 0) return;
 
-    // Pick a random unplayed action
+    if (enemySkipNext) { enemySkipNext = false; log('Enemy is stunned — turn skipped!', 'enemy'); renderFightHand(pStats, eStats); return; }
+
     var available = [];
     for (var i = 0; i < enemyActions.length; i++) {
       if (!enemyActions[i]._played) {
@@ -512,11 +618,36 @@
     var cost = typeof action.cost === 'number' ? action.cost : 0;
     eStats.eng -= cost;
     action._played = true;
+    enemyAtkMult = 1;
 
-    var dmg = calcDamage(eStats, pStats, action);
-    pStats.hp -= dmg;
-    log('Enemy plays ' + action.name + ' — ' + dmg + ' damage! (Enemy ENG: ' + eStats.eng + ')', 'enemy');
-    log('Your HP: ' + Math.max(0, pStats.hp), 'you');
+    var msg = 'Enemy plays ' + action.name;
+
+    // Enemy card effects (simplified — AI uses same effects)
+    if (action.shield) { enemyShielded = true; msg += ' — Shield active!'; }
+    if (action.defBoost) { enemyDefExtra = action.defBoost; msg += ' — +DEF!'; }
+    if (action.heal) { eStats.hp = Math.min(enemyMaxHp, eStats.hp + action.heal); msg += ' — healed ' + action.heal + '!'; }
+    if (action.atkBoost) { enemyAtkMult = action.atkBoost; msg += ' — ATK boosted!'; }
+    if (action.engGain) { eStats.eng += action.engGain; msg += ' — +ENG!'; }
+    if (action.engDrain) { pStats.eng = Math.max(0, pStats.eng - action.engDrain); msg += ' — drained your ENG!'; }
+    if (action.skipEnemy) { playerSkipNext = true; msg += ' — you skip next turn!'; }
+    if (action.spdBonus) { /* enemy SPD bonus */ }
+    if (action.dodge) { msg += ' — will dodge next attack!'; }
+
+    if (typeof action.dmg === 'number' || typeof action.mult === 'number') {
+      var dmg = resolveDamage(eStats, pStats, action, enemyAtkMult);
+      if (playerShielded) {
+        playerShielded = false;
+        msg += ' — BLOCKED by your shield!';
+      } else {
+        pStats.hp -= dmg;
+        msg += ' — ' + dmg + ' damage!';
+      }
+    }
+
+    enemyDefExtra = 0;
+    msg += ' (Enemy ENG: ' + eStats.eng + ')';
+    log(msg, 'enemy');
+    log('Your HP: ' + Math.max(0, pStats.hp) + ' | Your ENG: ' + pStats.eng, 'you');
 
     renderFighterStats('playerFighterStats', pStats, playerMaxHp, true);
     renderFighterStats('enemyFighterStats', eStats, enemyMaxHp, false);
@@ -526,7 +657,6 @@
       return;
     }
 
-    // If both passed or all actions used, end round by HP
     var pAvail = false;
     for (var j = 0; j < playerActions.length; j++) {
       if (!playerActions[j]._played) {
@@ -539,27 +669,6 @@
     } else {
       renderFightHand(pStats, eStats);
     }
-  }
-
-  function calcDamage(attacker, defender, action) {
-    var base = attacker.atk;
-    // Category bonus
-    var cat = String(action.category || '').toLowerCase();
-    var bonus = 0;
-    if (cat === 'strike') bonus = 5;
-    else if (cat === 'weapon') bonus = 3;
-    else if (cat === 'precision') bonus = 4;
-    else if (cat === 'boost') bonus = 6;
-    else bonus = 2;
-
-    var raw = base + bonus;
-    var blocked = Math.min(defender.def, Math.floor(raw * 0.5));
-    var dmg = Math.max(1, raw - blocked);
-
-    // Range bonus: if attacker out-ranges, +3 damage
-    if (attacker.rng > defender.rng) dmg += 3;
-
-    return dmg;
   }
 
   function checkRoundEnd(pStats, eStats) {
