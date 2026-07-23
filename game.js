@@ -374,6 +374,10 @@
     playerSpdBonus = 0; enemySkipNext = false; playerSkipNext = false;
     playerFreeStrike = false;
 
+    // Reset action cards — fresh hand each round
+    for (var i = 0; i < playerActions.length; i++) { playerActions[i]._played = false; }
+    for (var i = 0; i < enemyActions.length; i++) { enemyActions[i]._played = false; }
+
     // Reset HP & ENG to full
     var pStats = {};
     var pKeys = Object.keys(pTemplate);
