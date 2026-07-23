@@ -204,13 +204,13 @@
 
     function showView(name) {
       if (name === 'play') {
-        playView.style.display = '';
-        rulesView.style.display = 'none';
+        playView.classList.add('active');
+        rulesView.classList.remove('active');
         playBtn.classList.add('active');
         rulesBtn.classList.remove('active');
       } else {
-        rulesView.style.display = '';
-        playView.style.display = 'none';
+        rulesView.classList.add('active');
+        playView.classList.remove('active');
         rulesBtn.classList.add('active');
         playBtn.classList.remove('active');
       }
