@@ -19,5 +19,5 @@ window.RULEBOOK = {
   families: { card: 'Part Cards', token: 'Chassis Tokens', tile: 'Action Cards' },
 
   // Lore — shown on the Rules page.
-  lore: 'In the year 2147, the Scrap Wars consumed the wastes. Engineers no longer built — they scavenged. From the rusted carcasses of fallen mechs, they forged new warriors. The arena is the only law. Two bots enter. One leaves standing. Build yours in secret. Reveal it in glory. Win in three rounds — or be scrapped.',
+  lore: 'The Scrap Wars, 2147. From rusted mech carcasses scattered across the wastes, engineers forge new warriors in secret workshops. Every part scavenged, every bolt tightened in darkness. The arena calls — two bots step into the light, their builds unknown to each other until the moment of revelation. Three rounds. First to two wins survives. The scrap heaps grow taller. Deep in the code of every chassis, a whisper persists — the DIVINE PROTOCOL, a legendary override said to appear once in a thousand builds, granting godlike power. Hunt for it. Fear it. The arena is law. Build in secret. Brawl in the open.',
 };
