@@ -159,7 +159,7 @@
     playerHand = shuffled.slice(0, Math.min(drawCount, shuffled.length));
 
     // God card — player only
-    if (godCard && Math.random() <= 0.99999) {
+    if (godCard && Math.random() <= 0.001) {
       playerHand.push(godCard);
     }
 
