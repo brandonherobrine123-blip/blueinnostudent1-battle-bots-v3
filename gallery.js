@@ -149,7 +149,7 @@
         ['Fight Phase', 'Best of 3 rounds. Shuffle action deck, each draws 15. Each round: full HP & ENG reset. Fresh action hand each round. Higher SPD goes first. Alternate playing 1 action — each card has unique effects matching its name (shield, heal, EMP, Overload, Last Stand, etc.). Cards reset after each round.'],
         ['Win Condition', 'First to win 2 rounds wins the match. Round win = knockout (HP to 0) OR highest HP when both pass. HP tie → higher ENG wins. ENG tie → sudden death.'],
         ['Action Cards', 'Heavy Strike: ATK+10. Quick Jab: play twice. Sniper Shot: RNG 6+, no counter. Energy Shield: block next hit. Scrap Shield: +5 DEF. Full Repair: heal 25. Patch Job: heal 10. Overload: next ATK ×2. Dodge Roll: auto-dodge. Counterstrike: return fire. EMP Burst: drain 10 ENG + stun. Last Stand: ATK×2 + heal 15 when HP≤15. Flanking: +3 SPD + free Strike. Barrage: ATK+8 + halve DEF. Recharge: +12 ENG. Pass: skip turn free.'],
-        ['God Card', 'DIVINE PROTOCOL — player only, 99.999% draw chance. Stacks up to 5 copies. +99 all stats, +999 ENG/HP. Slot-free.']
+        ['God Card', 'DIVINE PROTOCOL — player only, 0.1% draw chance (1 in 1,000). Single copy. +99 all stats, +999 ENG/HP. Slot-free. A whisper in the code — rarely seen, never forgotten.']
       );
     }
     for (var i = 0; i < rows.length; i++) {
