@@ -107,19 +107,8 @@
 
   // ---- Level filtering ----
   function filterByLevel(assets) {
-    var draw = LEVEL_DRAW[currentLevel];
-    // Each player draws `draw` cards, so deck needs 2x that many cards.
-    var deckSize = draw * 2;
-    var grouped = C.groupByType(assets);
-    var result = [];
-    for (var t = 0; t < C.TYPES.length; t++) {
-      var type = C.TYPES[t];
-      var items = grouped[type] || [];
-      // Show up to deckSize cards per type (proportional to availability)
-      result = result.concat(items.slice(0, deckSize));
-    }
-    // Cap total shown cards to deckSize
-    return result.slice(0, deckSize);
+    // Gallery shows everything — filtering only applies to game draw
+    return assets;
   }
 
   // ---- Render ----
