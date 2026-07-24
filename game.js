@@ -151,23 +151,20 @@
     enemyMaterials = [];
     fightRound = 0;
 
-    // Shared deck — shuffle once, deal to both players (each card appears once)
+    // Independent draws — each player shuffles the full pool separately
     var normalPool = ASSETS.filter(function (a) { return a.type === 'card' && a.category !== 'God'; });
     var godCard = ASSETS.filter(function (a) { return a.type === 'card' && a.category === 'God'; })[0];
     var drawCount = LEVEL_DRAW[currentLevel];
-    var sharedDeck = shuffle(normalPool);
-    var half = Math.min(drawCount, Math.floor(sharedDeck.length / 2));
-    playerHand = sharedDeck.slice(0, half);
-    enemyHand = sharedDeck.slice(half, Math.min(half * 2, sharedDeck.length));
+    var shuffled = shuffle(normalPool);
+    playerHand = shuffled.slice(0, Math.min(drawCount, shuffled.length));
 
     // God card — player only
-    if (godCard) {
-      for (var g = 0; g < 5; g++) {
-        if (Math.random() <= 0.99999) {
-          playerHand.push(godCard);
-        }
-      }
+    if (godCard && Math.random() <= 0.99999) {
+      playerHand.push(godCard);
     }
+
+    var enemyShuffled = shuffle(normalPool);
+    enemyHand = enemyShuffled.slice(0, Math.min(drawCount, enemyShuffled.length));
 
     // Auto-build enemy
     buildEnemyBot();
